@@ -1,4 +1,5 @@
 *~
+*.pem
 *.sw[mnpcod]
 *.log
 *.tmp
