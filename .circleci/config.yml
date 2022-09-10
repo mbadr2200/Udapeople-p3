@@ -158,6 +158,26 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       - destroy-environment
+  configure-infrastructure:
+    docker:
+      - image: cimg/aws:2022.06
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "c0:4b:33:b3:6b:8e:0f:dd:45:78:7b:4d:75:99:06:91"
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            yum install -y tar gzip ansible
+      - run:
+          name: Configure server
+          command: |
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
+      - destroy-environment    
 
 
 workflows:
@@ -175,3 +195,5 @@ workflows:
           requires: [build-frontend]
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
