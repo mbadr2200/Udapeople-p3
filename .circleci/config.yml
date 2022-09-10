@@ -185,9 +185,9 @@ jobs:
             sudo apt-get -y install gzip tar
             sudo apt update
             sudo apt install ansible
-      - run:
-          name: Show the content of the inventory file
-          command: cat inventory
+      # - run:
+      #     name: Show the content of the inventory file
+      #     command: cat inventory
       - run:
           name: Configure server
           command: |
