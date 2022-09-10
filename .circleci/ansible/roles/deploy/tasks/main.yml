@@ -1,0 +1,31 @@
+- name: "create web directory"
+  become: true
+  file: 
+      path: ~/web
+      state: directory
+
+# copy the files to ansible
+- name: "copy file to ec2"
+  copy:
+    src: "artifact.tar.gz"
+    dest: "~/web"
+
+# extract the files 
+- name: Extract artifact.tar.gz web
+  unarchive:
+    src: artifact.tar.gz
+    dest: ~/web
+
+# npm install 
+- name: Install packages based on package.json.
+  npm:
+    path: ~/web/backend
+# pm2 stop default 
+# pm2 start npm -- start
+
+- name: "Start PM2 SERVER"
+  shell: |
+    pm2 stop default
+    pm2 start npm -- start
+    # pm2 start ~/web/index.js -f
+

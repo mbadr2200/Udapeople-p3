@@ -260,22 +260,38 @@ jobs:
       - destroy-environment
       - revert-migrations
    ###############
-   deploy-backend:
+  deploy-backend:
     docker:
       - image: cimg/aws:2022.06
     steps:
       - checkout
-      # Add ssh keys with fingerprint
-      # attach workspace
+      - add_ssh_keys:
+          fingerprints:
+            - "c0:4b:33:b3:6b:8e:0f:dd:45:78:7b:4d:75:99:06:91"
+      - attach_workspace:
+          at: ~/
       - run:
           name: Install dependencies
           command: |
-            # your code here
+            sudo apt-get -y install gzip tar
+            sudo apt update
+            sudo apt install ansible
       - run:
           name: Deploy backend
           command: |
-            # your code here
-      # Here's where you will add some code to rollback on failure 
+            cd backend
+            npm i
+            npm run build
+            cd ..
+            # Zip the directory
+            tar -C backend -czvf artifact.tar.gz .
+            cp artifact.tar.gz .circleci/ansible/roles/deploy/files
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
+      - destroy-environment
+      - revert-migrations
 workflows:
   default:
     jobs:
@@ -296,4 +312,6 @@ workflows:
       - run-migrations:
           requires: [configure-infrastructure]
       - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
           requires: [run-migrations]
