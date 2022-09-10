@@ -188,7 +188,7 @@ jobs:
             sudo apt install ansible
       - run:
           name: Show the content of the inventory file
-          command: cat inventory.txt
+          command: cat inventory
       - run:
           name: Configure server
           command: |
