@@ -36,5 +36,5 @@
     - TYPEORM_MIGRATIONS_DIR: "{{ lookup('env', 'TYPEORM_MIGRATIONS_DIR')}}"
 
   roles:
-    - /configure-server/configure
-    - /configure-server/install
+    - configure-server/tasks/configure
+    - configure-server/tasks/install
