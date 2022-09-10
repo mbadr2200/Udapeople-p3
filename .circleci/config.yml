@@ -172,6 +172,7 @@ jobs:
           name: Install dependencies
           command: |
             sudo apt-get -y install gzip tar
+            sudo apt update
             sudo apt install ansible
       - run:
           name: Configure server
