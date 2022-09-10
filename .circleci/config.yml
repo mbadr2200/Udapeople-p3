@@ -187,6 +187,9 @@ jobs:
             sudo apt update
             sudo apt install ansible
       - run:
+          name: Show the content of the inventory file
+          command: cat inventory.txt
+      - run:
           name: Configure server
           command: |
             cd .circleci/ansible
