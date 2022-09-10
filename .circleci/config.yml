@@ -160,7 +160,7 @@ jobs:
       - destroy-environment
   configure-infrastructure:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: cimg/aws:2022.06
     steps:
       - checkout
       - add_ssh_keys:
@@ -171,9 +171,8 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update tar gzip
-            apk add --update awscli
-            apk add --update ansible
+            apt-get -y install gzip tar
+            apt-get -y install ansible
       - run:
           name: Configure server
           command: |
