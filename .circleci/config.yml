@@ -158,7 +158,6 @@ jobs:
           name: Add back-end ip to ansible inventory
           command: |
             touch inventory
-            echo [All] > inventory
             aws ec2 describe-instances \
             \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
