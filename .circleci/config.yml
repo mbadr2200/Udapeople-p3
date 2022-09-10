@@ -4,9 +4,7 @@ orbs:
 
 commands:
   destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-    parameters:
-      # Add parameter here   
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID. 
     steps:
       - run:
           name: Destroy environments
@@ -15,22 +13,22 @@ commands:
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID}
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID}
 
-  # revert-migrations:
-  #   description: Revert the last migration if successfully run in the current workflow.   
-  #   steps:
-  #     - run:
-  #         name: Revert migrations
-  #         when: on_fail
-  #         command: |
-  #           # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-  #           SUCCESS = 1
-  #           if(( $SUCCESS==1 )); 
-  #           then
-  #           #  cd ~/project/backend
-  #           #  npm install
-  #           #  Add revert code here. You can find this in the Getting Started section.
-  #             exit 1
-  #           fi        
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.   
+    steps:
+      - run:
+          name: Revert migrations
+          when: on_fail
+          command: |
+            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
+            SUCCESS = 1
+            if(( $SUCCESS==1 )); 
+            then
+            #  cd ~/project/backend
+            #  npm install
+            #  Add revert code here. You can find this in the Getting Started section.
+              exit 1
+            fi        
 jobs:
 
   ###############
@@ -217,8 +215,48 @@ jobs:
             then
               curl https://kvdb.io/MkPMbxYNC98yASkkbUpqAw/migration_${CIRCLE_WORKFLOW_ID}  -d '1'
             fi
-    #  - revert-migrations
-
+  ###############
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli 
+    steps:
+      - checkout 
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install Python
+          command: |
+           sudo apt install python
+      - run:
+          name: Install Ansible
+          command: |
+            sudo apt install ansible
+      - run:
+          name: Install node & npm
+          command: |
+             sudo apt install nodejs 
+             sudo apt install npm
+      - run:
+          name: Get backend url
+          command: |
+            export BACKEND_IP=$( aws ec2 describe-instances \
+            \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filters "Name=tag:project,Values=udapeople-p3" \)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+        
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID} --recursive
+      -  destroy-environment
 workflows:
   default:
     jobs:
