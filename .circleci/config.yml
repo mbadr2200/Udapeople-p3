@@ -11,6 +11,7 @@ commands:
           when: on_fail
           command: |
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID}
+            aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID}
 
   revert-migrations:
@@ -20,11 +21,12 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS= curl --insecure https://kvdb.io/MkPMbxYNC98yASkkbUpqAw/migration_${CIRCLE_WORKFLOW_ID}
+            SUCCESS= curl --insecure https://kvdb.io/MeqHVKScZVo7WxsAWR3oa3/migration_${CIRCLE_WORKFLOW_ID}
             if(( $SUCCESS==1 )); 
             then
-              cd backend
-              npm run migrations:revert
+               cd ~/project/backend
+                npm install
+                npm run migration:revert
             fi        
 
 jobs:
@@ -209,7 +211,7 @@ jobs:
           command: |
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
-              curl https://kvdb.io/MkPMbxYNC98yASkkbUpqAw/migration_${CIRCLE_WORKFLOW_ID}  -d '1'
+              curl https://kvdb.io/MeqHVKScZVo7WxsAWR3oa3/migration_${CIRCLE_WORKFLOW_ID}  -d '1'
             fi
       - revert-migrations
   ###############
@@ -322,6 +324,7 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
+            export API_URL="http://${BACKEND_IP}:3030"
             if curl "${API_URL}/api/status" | grep "ok"
             then
                 return 0
