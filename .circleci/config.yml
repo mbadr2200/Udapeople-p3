@@ -313,10 +313,6 @@ jobs:
       - image: cimg/aws:2022.06
     steps:
       - checkout 
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       # your code here
       - run:
           name: Get backend url
           command: |
@@ -324,7 +320,7 @@ jobs:
             \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
             --filters "Name=tag:project,Values=udapeople-p3" \
-            -- output text
+            --output text
              )
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
