@@ -399,7 +399,7 @@ jobs:
                 aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
               fi
 workflows:
-  default:
+  devops-p3-2200:
     jobs:
       - build-frontend
       - build-backend
