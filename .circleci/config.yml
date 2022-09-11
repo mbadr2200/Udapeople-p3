@@ -10,9 +10,9 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID}
-            aws s3 rm "s3://udapeople-${CIRCLE_WORKFLOW_ID}" --recursive
-            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID}
+            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_NAME}
+            aws s3 rm "s3://udapeople-${CIRCLE_WORKFLOW_NAME}" --recursive
+            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_NAME}
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.   
@@ -21,7 +21,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure  https://kvdb.io/MeqHVKScZVo7WxsAWR3oa3/migration_${CIRCLE_WORKFLOW_ID:0:7})
+            SUCCESS=$(curl --insecure  https://kvdb.io/MeqHVKScZVo7WxsAWR3oa3/migration_${CIRCLE_WORKFLOW_NAME})
             if(( $SUCCESS==1 )); 
             then
                 cd ~/project/backend
@@ -146,16 +146,16 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --tags project=udapeople-p3 \
-              --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID} \
-              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID} 
+              --stack-name udapeople-backend-${CIRCLE_WORKFLOW_NAME} \
+              --parameter-overrides ID=${CIRCLE_WORKFLOW_NAME} 
       - run:
           name: Ensure front-end infrastructure exist
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
               --tags project=udapeople-p3 \
-              --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID} \
-              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID}   
+              --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_NAME} \
+              --parameter-overrides ID=${CIRCLE_WORKFLOW_NAME}   
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -212,9 +212,9 @@ jobs:
             if grep -q "has been executed successfully." backend/migrations_dump.txt
             then
               echo "migration Done"
-              curl https://kvdb.io/MeqHVKScZVo7WxsAWR3oa3/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              curl https://kvdb.io/MeqHVKScZVo7WxsAWR3oa3/migration_${CIRCLE_WORKFLOW_NAME}  -d '1'
             else
-              curl https://kvdb.io/MeqHVKScZVo7WxsAWR3oa3/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '0'
+              curl https://kvdb.io/MeqHVKScZVo7WxsAWR3oa3/migration_${CIRCLE_WORKFLOW_NAME}  -d '0'
             fi
       - revert-migrations
   ###############
@@ -265,8 +265,8 @@ jobs:
             cd frontend
             npm install
             npm run build
-            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID}".tar.gz dist
-            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID} --recursive
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_NAME}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_NAME} --recursive
       - destroy-environment
       - revert-migrations
    ###############
@@ -344,7 +344,7 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-              URL="http://udapeople-${CIRCLE_WORKFLOW_ID}.s3-website-us-east-1.amazonaws.com/#/employees"            
+              URL="http://udapeople-${CIRCLE_WORKFLOW_NAME}.s3-website-us-east-1.amazonaws.com/#/employees"            
               echo ${URL} 
               if curl -s ${URL} | grep "Welcome"
               then
@@ -369,7 +369,7 @@ jobs:
             aws cloudformation deploy \
             --template-file .circleci/files/cloudfront.yml \
             --stack-name InitialStack \
-            --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID}" \
+            --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_NAME}" \
             --tags project=udapeople-p3
   cleanup:
       docker:
@@ -383,7 +383,7 @@ jobs:
               list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               --no-paginate --output text)
               echo OldWorkflowID: "${OldWorkflowID}"
-              echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID}"
+              echo CIRCLE_WORKFLOW_NAME "${CIRCLE_WORKFLOW_NAME}"
               export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
               --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
               echo Stack names: "${STACKS[@]}"
@@ -391,7 +391,7 @@ jobs:
         - run:
             name: Remove old stacks and files
             command: |
-              if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${OldWorkflowID}" ]]
+              if [[ "${CIRCLE_WORKFLOW_NAME}" =~ "${OldWorkflowID}" ]]
               then
                 aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
                 aws s3 rb s3://${OldWorkflowID} --force 
