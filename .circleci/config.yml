@@ -293,6 +293,10 @@ jobs:
             ls
             cp artifact.tar.gz .circleci/ansible/roles/deploy/files
       - run:
+          name: "Move Generated Zip"
+          command: |
+            cp artifact.tar.gz .circleci/ansible/roles/deploy/files
+      - run:
           name: Deploy backend
           command: |    
             cd .circleci/ansible
