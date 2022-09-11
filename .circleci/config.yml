@@ -227,8 +227,9 @@ jobs:
       - run:
           name: Install Python3
           command: |
+           sudo add-apt-repository universe
            sudo apt update
-           sudo apt install python3.8
+           sudo apt install python3-pip
       - run:
           name: Install Ansible
           command: |
