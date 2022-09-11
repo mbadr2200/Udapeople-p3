@@ -157,7 +157,6 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            touch inventory
             aws ec2 describe-instances \
             \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
@@ -226,9 +225,10 @@ jobs:
            sudo apt update
            sudo apt install tar
       - run:
-          name: Install Python
+          name: Install Python3
           command: |
-           sudo apt install python
+           sudo apt update
+           sudo apt install python3.8
       - run:
           name: Install Ansible
           command: |
