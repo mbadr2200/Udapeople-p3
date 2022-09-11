@@ -224,15 +224,15 @@ jobs:
           command: |
            sudo apt update
            sudo apt install tar
-      - run:
-          name: Install Python3
-          command: |
-           sudo apt update
-           sudo apt install python3-pip
-      - run:
-          name: Install Ansible
-          command: |
-            sudo apt install ansible
+      # - run:
+      #     name: Install Python3
+      #     command: |
+      #      sudo apt update
+      #      sudo apt install python3-pip
+      # - run:
+      #     name: Install Ansible
+      #     command: |
+      #       sudo apt install ansible
       - run:
           name: Install node & npm
           command: |
@@ -280,15 +280,21 @@ jobs:
             sudo apt update
             sudo apt install ansible
       - run:
-          name: Deploy backend
+          name: "build the backend"
           command: |
             cd backend
             npm i
             npm run build
             cd ..
-            # Zip the directory
-            tar -C backend -czvf artifact.tar.gz .
+      - run:
+          name: "Zip the backend and move it to ansible"
+          command: |
+            tar -C backend -czvf artifact.tar.gz
+            ls
             cp artifact.tar.gz .circleci/ansible/roles/deploy/files
+      - run:
+          name: Deploy backend
+          command: |    
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt

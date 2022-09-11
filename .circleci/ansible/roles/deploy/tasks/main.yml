@@ -11,21 +11,6 @@
     src: artifact.tar.gz
     dest: ~/
 
-- name: "Install Dependance"
-  become: true
-  apt:
-    name: ['nodejs',"npm"]
-    state: latest
-    update_cache: yes
-    
-- name: "Install PM2"
-  become: true
-  npm:
-    name: pm2
-    global: yes
-    production: yes
-    state: present
-
 - name: "Start PM2 SERVER"
   shell: |
     npm install
