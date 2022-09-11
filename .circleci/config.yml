@@ -290,7 +290,6 @@ jobs:
           name: "Zip the backend and move it to ansible"
           command: |
             tar -c backend -czvf artifact.tar.gz
-            ls
             mkdir .circleci/ansible/roles/deploy/files
             cp artifact.tar.gz .circleci/ansible/roles/deploy/files
       - run:
