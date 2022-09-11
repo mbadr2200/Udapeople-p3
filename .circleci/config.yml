@@ -296,7 +296,12 @@ jobs:
           name: Deploy backend
           command: |    
             cd .circleci/ansible
-            cd roles/deploy/files
+            ls
+            cd roles
+            ls
+            cd deploy
+            ls
+            cd files
             echo "---------------------------------"
             cd ../../../
             echo "Contents  of the inventory.txt file is -------"
