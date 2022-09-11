@@ -209,9 +209,10 @@ jobs:
       - run:
           name: Send migration results to kvdb
           command: |
-            ls
+            ls backend
             if grep -q "has been executed successfully." backend/migrations_dump.txt
             then
+              echo "migration Done"
               curl https://kvdb.io/MeqHVKScZVo7WxsAWR3oa3/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
       - revert-migrations
