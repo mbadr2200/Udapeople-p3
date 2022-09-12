@@ -229,15 +229,6 @@ jobs:
           command: |
            sudo apt update
            sudo apt install tar
-      # - run:
-      #     name: Install Python3
-      #     command: |
-      #      sudo apt update
-      #      sudo apt install python3-pip
-      # - run:
-      #     name: Install Ansible
-      #     command: |
-      #       sudo apt install ansible
       - run:
           name: Install node & npm
           command: |
@@ -359,10 +350,6 @@ jobs:
       - image: cimg/aws:2022.06
     steps:
       - checkout 
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       # your code here
       - run:
           name: Update cloudfront distribution
           command: |
