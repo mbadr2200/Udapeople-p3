@@ -4,7 +4,7 @@
     path: /etc/prometheus/prometheus.yml
     after: "node_exporter"
     regexp: ^(.*)- targets:(.*)$
-    replace: "- targets: [{{ newBackendUrl }}]"
+    replace: "      - targets: [{{ newBackendUrl }}]"
 
 - name: "Show the content of the config file "
   become: true
