@@ -6,6 +6,11 @@
     regexp: ^(.*)- targets:(.*)$
     replace: "- targets: [{{ newBackendUrl }}]"
 
+- name: "Show the content of the config file "
+  become: true
+  shell: cat /etc/prometheus/prometheus.yml
+    
+
 - name: "Restart prometheus Service"
   become: true
   systemd:
