@@ -3,7 +3,7 @@
   replace:
     path: /etc/prometheus/prometheus.yml
     after: "node_exporter"
-    regexp: '^- targets: *'
+    regexp: ^(.*)- targets:(.*)$
     replace: "- targets: [{{ newBackendUrl }}]"
 
 - name: "Restart prometheus Service"
