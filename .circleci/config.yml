@@ -390,6 +390,30 @@ jobs:
              else
               echo '----------------cannot clean-----------------------'
              fi
+    replace-prometheus-target:
+      docker:
+        - image: cimg/aws:2022.06
+      steps:
+        - checkout
+        - run:
+            name: Get old stack workflow id & Remove old stacks and files
+            command: |
+              # GET NEW BACKEND IP/DNS
+              export BACKEND_IP=$( aws ec2 describe-instances \
+              \
+              --query 'Reservations[*].Instances[*].PublicDnsName' \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output text
+              )
+              # RUN ANSIBLE PLAYBOOK WITH VARIABLE (newBackendUrl)
+              cd .circleci/ansible
+              echo "Contents  of the inventory.txt file is -------"
+              cat inventory.txt
+              echo "Run Ansible For Update Prometheus -------"
+              ansible-playbook -i inventory.txt promethues-config.yml --extra-vars "newBackendUrl=$BACKEND_IP"
+
+             
+    
 workflows:
   devops-p3-2200:
     jobs:

@@ -1,0 +1,14 @@
+- name: "Update Prometheus Target"
+  become: true
+  replace:
+    path: /etc/prometheus/prometheus.yml
+    after: "node_exporter"
+    regexp:'^- targets: *'
+    replace: "- targets: [{{ newBackendUrl }}]"
+
+- name: "Restart prometheus Service"
+  become: true
+  systemd:
+     state: restarted
+     daemon_reload: yes
+     name: prometheus
